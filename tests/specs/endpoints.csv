@@ -1,0 +1,5 @@
+name,method,url,bodyFile,expectedStatus
+list_users,GET,https://reqres.in/api/users?page=2,,200
+create_user,POST,https://reqres.in/api/users,create_user.json,201
+user_details,GET,https://reqres.in/api/users/2,,200
+

@@ -1,0 +1,16 @@
+{
+  "name": "api-tests-js",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
+

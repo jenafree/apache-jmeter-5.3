@@ -1,0 +1,8 @@
+reports/
+results/
+**/*.jtl
+**/*.log
+**/.DS_Store
+tests/js/node_modules/
+tests/rest-assured/target/
+
