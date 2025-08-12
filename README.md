@@ -1,34 +1,141 @@
-# Performance tests with Apache JMeter 5.3
+# Testes de API e Performance (JMeter + Rest Assured + Jest)
 
-This repository packages Apache JMeter 5.3 and adds a simple, reproducible way to run performance tests headlessly and generate HTML reports.
+Este repositório demonstra, de ponta a ponta, como testar APIs de forma funcional (contrato) e como medir desempenho (carga/estresse) reutilizando os mesmos cenários.
 
-## Prerequisites
+## O que você encontra aqui
 
-- Java 8+ installed and available on PATH
+- **Funcional/Contrato**: testes em Java (Rest Assured) e JavaScript (Jest + Supertest)
+- **Performance**: plano JMeter que consome os mesmos cenários via CSV e gera relatório HTML
+- **Automação simples**: scripts para executar tudo por linha de comando
 
-## Quick start
+---
 
-- Windows (PowerShell):
+## Conceitos rápidos (API REST)
 
-  ```powershell
-  .\scripts\run.ps1 -Test .\apache-jmeter-5.3\bin\examples\CSVSample.jmx
-  ```
+- **Endpoint**: URL de um recurso (ex.: `GET https://reqres.in/api/users?page=2`)
+- **Contrato**: o que esperamos receber (status code, campos, tipos)
+- **Idempotência**: requisições que podem ser repetidas com o mesmo resultado
+- **Teste funcional**: valida o contrato sem concorrência pesada
+- **Teste de performance**: mede latências (P95/P99), throughput e erros sob carga
 
-- Linux/macOS:
+---
 
-  ```bash
-  bash scripts/run.sh -t apache-jmeter-5.3/bin/examples/CSVSample.jmx
-  ```
+## Metodologia
 
-The commands will create a timestamped `.jtl` under `results/` and an HTML report under `reports/` (open `index.html`).
+- **Pilar 1 – Contrato**: Rest Assured (Java) e Jest/Supertest (JS)
+- **Pilar 2 – Fluxos**: encadeiam endpoints (ex.: criar → consultar)
+- **Pilar 3 – Performance**: JMeter aplica concorrência e mede métricas
+- **Fonte única**: `tests/specs/endpoints.csv` e `tests/specs/bodies/*.json`
 
-## Adding your own tests
+---
 
-- Create or copy `.jmx` plans anywhere in the repo (e.g., `tests/`)
-- Run them using the scripts above, pointing `-Test`/`-t` to your plan
+## Estrutura do repositório
 
-## Repository layout
+- `apache-jmeter-5.3/`: distribuição do JMeter
+- `scripts/`: utilitários para executar testes
+- `tests/specs/endpoints.csv`: lista de cenários (método, URL, body, status)
+- `tests/specs/bodies/`: payloads JSON
+- `tests/rest-assured/`: testes Java (Maven/JUnit5/Rest Assured)
+- `tests/js/`: testes JS (Jest/Supertest)
+- `tests/jmeter/reqres.jmx`: plano JMeter (CSV/JSON)
+- `results/` e `reports/`: saídas geradas (gitignored)
 
-- `apache-jmeter-5.3/`: JMeter distribution
-- `scripts/`: helper scripts to run headless and produce reports
-- `results/` and `reports/`: output (gitignored)
+---
+
+## Pré‑requisitos
+
+- Java 11+ (ou 8+) no PATH
+- Maven (para os testes Java)
+- Node.js 18+ (para os testes JS)
+
+---
+
+## Como executar
+
+### 1) Testes funcionais (Java + JS)
+
+Windows (PowerShell):
+
+```powershell
+./scripts/run-functional.ps1
+```
+
+Linux/macOS:
+
+```bash
+bash scripts/run-functional.sh
+```
+
+Esse passo executa Java/Rest Assured (`tests/rest-assured`) e JS/Jest (`tests/js`).
+
+### 2) Teste de performance (JMeter)
+
+Windows (PowerShell):
+
+```powershell
+./scripts/run.ps1 -Test ./tests/jmeter/reqres.jmx
+```
+
+Linux/macOS:
+
+```bash
+bash scripts/run.sh -t tests/jmeter/reqres.jmx
+```
+
+Saídas geradas:
+
+- `.jtl` em `results/AAAAmmdd-HHMMSS.jtl`
+- HTML em `reports/AAAAmmdd-HHMMSS/index.html`
+
+Abra o relatório para analisar P50/P90/P95/P99, throughput e taxa de erro.
+
+---
+
+## Cenários (CSV compartilhado)
+
+Arquivo: `tests/specs/endpoints.csv`
+
+```csv
+name,method,url,bodyFile,expectedStatus
+list_users,GET,https://reqres.in/api/users?page=2,,200
+create_user,POST,https://reqres.in/api/users,create_user.json,201
+user_details,GET,https://reqres.in/api/users/2,,200
+```
+
+- `bodyFile` aponta para JSONs em `tests/specs/bodies/`
+- Rest Assured, Jest e JMeter usam esse mesmo CSV/JSON
+
+### Adicionar um novo cenário
+
+1) Crie (se necessário) o payload em `tests/specs/bodies/novo.json`
+
+2) Adicione a linha no `endpoints.csv`
+
+3) Rode os testes funcionais; se passar, rode o JMeter
+
+---
+
+## Boas práticas
+
+- Idempotência e isolamento de dados
+- Parametrização por ambiente (URLs, tokens)
+- Validação de contrato (schema) quando fizer sentido
+- SLAs claros (ex.: erro < 1%, P95 < 500 ms)
+
+---
+
+## Dúvidas comuns
+
+PowerShell bloqueou scripts? Rode:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+Falta Maven/Node? Verifique:
+
+```bash
+mvn -v
+node -v
+npm -v
+```
