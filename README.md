@@ -139,3 +139,16 @@ mvn -v
 node -v
 npm -v
 ```
+
+---
+
+## Objetivo do repositório e contribuições
+
+Este repositório é **material de estudo e referência prática** sobre testes de API e performance.
+
+Feedbacks e contribuições são muito bem‑vindos!
+
+- Abra um issue com dúvidas, ideias ou problemas
+- Envie um PR com melhorias, novos cenários, correções ou docs
+- Siga (se possível) Conventional Commits (`docs:`, `test:`, `feat:`, `fix:`, `chore:`)
+- Antes do PR, rode os testes funcionais e gere o relatório do JMeter
