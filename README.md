@@ -160,3 +160,9 @@ Feedbacks e contribuições são muito bem‑vindos!
 - 2025-08: Estrutura unificada de testes (Java/JS) e carga (JMeter) com CSV compartilhado; guia em português; scripts de execução.
 - 2025-08: Limpeza de submódulos antigos e organização do repositório.
 - 2023–2024: Uso do JMeter 5.3 como base de experimentos e estudos (exemplos e templates).
+
+---
+
+## Sobre o autor
+
+- LinkedIn: [https://www.linkedin.com/in/nof-5442209a/](https://www.linkedin.com/in/nof-5442209a/)
