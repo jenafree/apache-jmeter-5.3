@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: m2-${{ hashFiles('tests/rest-assured/pom.xml') }}
+
+      - name: Java tests (Rest Assured)
+        working-directory: tests/rest-assured
+        run: mvn -q -DskipTests=false test
+
+      - name: JS install
+        working-directory: tests/js
+        run: npm install --no-audit --no-fund
+
+      - name: JS tests (Jest)
+        working-directory: tests/js
+        run: npm test -- --runInBand
+
+      - name: JMeter load (headless)
+        run: bash scripts/run.sh -t tests/jmeter/reqres.jmx
+
+      - name: Upload JMeter artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-report
+          path: |
+            results/**
+            reports/**
+
